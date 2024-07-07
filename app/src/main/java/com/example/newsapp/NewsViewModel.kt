@@ -11,16 +11,17 @@ class NewsViewModel : ViewModel() {
 
     private val newsApi = RetrofitInstance.newsApi
 
-    fun getData(news : String){
-
+    fun getData(query: String) {
         viewModelScope.launch {
-            val response = newsApi.getNews(Constant.apiKey, news)
-            if(response.isSuccessful){
-                Log.i("Response :",response.body().toString())
-            }else{
-                Log.i("Error :",response.message())
+            val response = newsApi.getNews(query, Constant.apiKey)
+            if (response.isSuccessful) {
+                val newsModel = response.body()
+                if (newsModel != null) {
+                    Log.i("Response", newsModel.toString())
+                }
+            } else {
+                Log.e("Error",response.message())
             }
         }
     }
-
 }
