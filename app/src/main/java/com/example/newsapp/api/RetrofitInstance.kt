@@ -14,4 +14,6 @@ object RetrofitInstance {
             .build()
     }
 
+    val newsApi : NewsApi = getInstance().create(NewsApi::class.java) //позволяет использовать интерфейс NewsApi для выполнения HTTP-запросов.
+
 }
