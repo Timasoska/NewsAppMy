@@ -15,27 +15,32 @@ class NewsViewModel : ViewModel() {
 
     private val newsApi = RetrofitInstance.newsApi// Получаем экземпляр API из RetrofitInstance
     private val _newsResult = MutableLiveData<NetworkResponse<NewsModel>>()// хранит данные, изменяемые во время выполнения программы
-    private val newsResult : LiveData<NetworkResponse<NewsModel>> = _newsResult // наблюдается во View или Activity для отображения данных или сообщений об ошибках.
+    val newsResult : LiveData<NetworkResponse<NewsModel>> = _newsResult // наблюдается во View или Activity для отображения данных или сообщений об ошибках.
 
     fun getData(query: String) {
+        _newsResult.value = NetworkResponse.Loading
         viewModelScope.launch {
             try {
                 val response = newsApi.getNews(query, Constant.apiKey)// Выполняем запрос к API с указанным запросом и ключом API
                 if (response.isSuccessful) {
                     val newsModel = response.body()
                     if (newsModel != null) {
-                        Log.i("Response", "Number of articles: ${newsModel.articles.size}")
+                        _newsResult.value = NetworkResponse.Success(newsModel)
+                        /*Log.i("Response", "Number of articles: ${newsModel.articles.size}")
                         newsModel.articles.forEach { article ->
                             Log.i("Article", article.toString()) // Логируем каждую статью
-                        }
+                        }*/
                     } else {
-                        Log.i("Response", "NewsModel is null")
+                        _newsResult.value = NetworkResponse.Error("NewsModel is null")
+                        //Log.i("Response", "NewsModel is null")
                     }
                 } else {
-                    Log.e("Error", response.message())
+                    _newsResult.value = NetworkResponse.Error(response.message())
+                    //Log.e("Error", response.message())
                 }
             } catch (e: Exception) {
-                Log.e("Exception", e.toString())
+                _newsResult.value = NetworkResponse.Error(e.toString())
+                //Log.e("Exception", e.toString())
             }
         }
     }
